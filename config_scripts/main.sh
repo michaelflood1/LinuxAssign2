@@ -17,18 +17,18 @@ while getopts ":idh" opt; # shows three arguments are possible. # the colon pref
 do
 	case $opt in
 		i)
-		  touch ${usrHomeDir}/installallowed
+		  touch ${usrHomeDir}/installallowed #creates a security file so only main.sh can run scripts
 		  echo "file touched"
-		  ./installer.sh
+		  ./installer.sh #calls the installation script
 		  rm ${usrHomeDir}/installallowed
-		  echo "file removed"
+		  echo "file removed" #removes security file
 		  ;;
-		d)
-		   touch ${usrHomeDir}/creationAllowed
+		d) #basically the same block as above
+		   touch ${usrHomeDir}/creationAllowed 
 		  ./directoryCreation.sh
 		  rm ${usrHomeDir}/creationAllowed
 		  ;;
-		h)
+		h) # tells the user detailed info about using the script
 		  echo "this script requires root or sudo privelage
 		  option -i will run the script required to install 
 		  packages for the computer
@@ -36,7 +36,7 @@ do
 		  symlinks to the cloned directories "
 		  ;;
 
-		\?) #invalid option attempted
+		\?) #invalid option attempted # a bad syntactical call from a user is responded to with correct usage
 			echo "useage:
 			sudo mandatory 'script path' [options] -i,-d,-h"
 			;;
