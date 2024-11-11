@@ -8,11 +8,11 @@ echo "$packageList"
 #iterate through users pre written list of packages
 if [[ -f ${usrHomeDir}/installallowed ]]; then
 
-echo "hi"
+
 
 	for line in ${packageList};
 	do
-		pacman -S --noconfirm ${line}
+		pacman -S --noconfirm ${line} # installs and forces through dialog for each package
 		echo "installed ${line}"
 		
 	done
