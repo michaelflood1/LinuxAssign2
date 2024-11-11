@@ -9,16 +9,24 @@ if [ "$EUID" -ne 0 ];
 	echo "run as root, or use 'sudo'"
 	exit 1
 fi
-
+usrHomeDir=$(getent passwd $SUDO_USER | cut -d: -f6)
+echo "starting main"
+pwd
 #getopts is used to parse optional arguments and to proceed with either a script call or messages to the user assisting with functionality of script.
 while getopts ":idh" opt; # shows three arguments are possible. # the colon prefix is to stop error messages
 do
 	case $opt in
 		i)
+		  touch ${usrHomeDir}/installallowed
+		  echo "file touched"
 		  ./installer.sh
+		  rm ${usrHomeDir}/installallowed
+		  echo "file removed"
 		  ;;
 		d)
+		   touch ${usrHomeDir}/creationAllowed
 		  ./directoryCreation.sh
+		  rm ${usrHomeDir}/creationAllowed
 		  ;;
 		h)
 		  echo "this script requires root or sudo privelage

@@ -1,24 +1,18 @@
 #!/bin/env bash
 
-git clone https://gitlab.com/cit2420/2420-as2-starting-files.git
-workDir=$(dirname $("realpath "$0")")
 
-if [[ ! -d ~/bin ]]; 
-	then
-	mkdir ~/bin
-	ln -s "${workDir}/bin" ~/bin
-fi
+usrHomeDir=$(getent passwd $SUDO_USER | cut -d: -f6)
+cloneLocation=${usrHomeDir}/Clone_repo
+mkdir ${cloneLocation}
+echo "cloning"
 
-if [[ ! -d ~/config ]];
-	then
-	mkdir ~/config
-	ln -s "${workDir}/config" ~/bin
-fi
+git clone https://gitlab.com/cit2420/2420-as2-starting-files.git ${cloneLocation}/
 
-if [[ ! -d ~home]];
-	then mkdir ~/home
-	touch ~/home/bashrc
-	ln -s "${workDir}/home" ~/home/.bashrc
+echo "home dir: $usrHomeDir"
+
+if [[ -f ${usrHomeDir}/creationAllowed ]]; then
+	cp -rs ${cloneLocation}/* ${usrHomeDir}/
+	ln -sfn ${usrHomeDir}/bash.rc ${cloneLocation}/bashrc
 fi
 
 
