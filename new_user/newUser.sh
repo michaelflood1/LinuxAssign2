@@ -16,52 +16,98 @@ if [[ "$EUID" -ne 0 ]];
 	exit 1
 fi
 
+# 1/0 Boolean flag for my optional arguments
+uFlag=""
+gFlag=""
+cFlag=""
 #parse options with getopts and proceed with a different method for each
 while getopts ":u:g:s:h" opt;
 do
 	case $opt in
-		u)
-			if [[ -z "$u" ]] ||  [[ -d ~/"${u} ]] ;
-				do
-				echo "this user is already created or 
-				additional argument require see
-				-u["username"]
-				exit 1
-			else
-				useradd -d ~/"${u}"
-				echo " add a password for the user"
-				passwd "${u}"
-
-			fi
-
+		u) 
+			uFlag="U" #shows username has been input
 			;;
 		g)
-			if [[ -z "$g" ]];
-			do
-				echo " additional argument required see
-				-g["group"]"
-				exit 1
-			fi
-
+			gFlag="G" #shows group has been input
 			;;
+
 		s)
-			if [[ -z "$s" ]];
-			do
-				echo "additional argument required see
-				-s[""]"
-			fi
-
+			sFlag="S" # shows shell has been input
 			;;
+
 		h)
-			echo "this script requires root or sudo privelages.
-			options -u -g -s ((username, groups, shell)) require
-			and additional [argument] 
-			-h for assistance"
+			echo "this script requires root or sudo
+			privelages.options -u -g -s 
+			((username, groups, shell)) require
+                        and additional [argument]
+                        -h for assistance"
+			exit 1
+                        ;;
 
-			;;
-		\?) 
+		*)
 			echo "useage:
-			sudo mandatory -u["username"] -g["grouptoadduserto"] -s["usersprefferedshell"] -h"
-
+                        sudo mandatory -u[username] 
+			-g[grouptoadduserto] -s[usersprefferedshell] -h"
+			exit 1
 			;;
 	esac
+done
+
+
+case "${uFlag} ${gFlag} ${sFlag}" in
+
+	U)
+		if [[ -d /home/"${u}" ]];
+		then
+			echo "username must not be taken"
+			exit 1
+		else
+			useradd -d /home/"${u}" "${u}"
+
+			passwd "${u}"
+
+			cp -r /etc/skel/. home/"${u}" 	
+
+		fi
+		;;
+
+	U G)
+		if [[ ! grep -q "^${g}:" /etc/group ]] || [[ -d /home/"${u}" ]]; then
+			echo "group must exist"
+			exit 1
+		else
+			useradd -aG "${g}" -d /home/"${u}" "${u}"
+                	passwd "${u}"
+			cp -r /etc/skel. /home/"${u}"
+		fi
+			
+			;;
+
+	U S)
+		if [[ ! /etc/shells/"${s}" ]] ||  [[ -d /home/"${u}" ]]; then
+			echo "arch does not support this shell type or you have an existing user with this name"
+			exit 1
+		else
+			useradd -s /etc/shells/"${s}" -d /home/"${u}" "${u}"
+			
+			passwd "${u}"
+			cp -r /etc/skel/. home/"${u}"
+		fi
+		;;
+
+	U G S)
+		if [[ -d /home/"${u}" ]] || [[ ! grep -q "^${g}:" /etc/group ]] || [[ ! /etc/shells/"${s}" ]]; then
+			echo " the username may be in use, the group may not exist, or we do not support your shell type"
+		else
+			useradd -aG "${g}" -s $"{s} -d /home/"${u} "${u}"
+                        passwd "${u}"
+                        cp -r /etc/skel/. ~/"${u}"
+		fi
+		;;
+	 *)
+		echo "useage:
+                        sudo mandatory -u["username"] -g["grouptoadduserto"] -s["usersprefferedshell"] -h"
+		;;
+
+ecas
+	
